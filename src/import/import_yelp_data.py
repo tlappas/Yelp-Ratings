@@ -10,6 +10,7 @@ if __name__ == '__main__':
     # Argument parser
     parser = argparse.ArgumentParser()
     parser.add_argument('-u', '--username', type=str, default='tlappas', help='User to access Postgres database. Default is \"tlappas\"')
+    parser.add_argument('-w', '--password', type=str, default='', help='Password to access database. Default is empty. Password is not needed if current user can access db.')
     parser.add_argument('-d', '--dbname', type=str, default='yelp', help='Name of the Postgres database. Must exist. Default is \"yelp\"')
     parser.add_argument('-p', '--path', type=str, default="""/home/tlappas/data_science/capstone/data""", help="""Location of the yelp json files. Default is \"/home/tlappas/data_science/capstone/data\"""")
     parser.add_argument('-o', '--host', type=str, default="""/var/run/postgresql""", help="""Postgres host. Default is \"/var/run/postgresql\"""")
@@ -19,6 +20,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     dbname = args.dbname
     username = args.username
+    password = args.password
     host = args.host
     dataset_path = args.path
     force = args.force
@@ -26,7 +28,11 @@ if __name__ == '__main__':
 
     conn = None
     try:
-        conn = psycopg2.connect('dbname=' + dbname + ' user=' + username + ' host=' + host)
+        if password == '':
+            conn = psycopg2.connect('dbname=' + dbname + ' user=' + username + ' host=' + host)
+        else:
+            pdb.set_trace()
+            conn = psycopg2.connect('dbname=' + dbname + ' user=' + username + ' password=' + password + ' host=' + host)
         if force == False:
             print('Database {} already exists. If you\'d like to drop and recreate existing tables use --force.'.format(dbname))
             sys.exit()
