@@ -30,7 +30,7 @@ class YelpDataImporter:
     # Not capturing attributes or hours. The JSON broke the query.
     def _populate_business_table(self):
         cur = self.conn.cursor()
-        with open(self.dataset_path + os.sep + 'business.json','r') as f:
+        with open(self.dataset_path + os.sep + 'business.json','r',encoding='utf8') as f:
             for line in f:
                 try:
                     data = json.loads(line)
@@ -49,7 +49,7 @@ class YelpDataImporter:
 
     def _populate_review_table(self):
         cur = self.conn.cursor()
-        with open(self.dataset_path + os.sep + 'review.json','r') as f:
+        with open(self.dataset_path + os.sep + 'review.json','r',encoding='utf8') as f:
             for line in f:
                 try:
                     data = json.loads(line)
@@ -69,7 +69,7 @@ class YelpDataImporter:
 
     def _populate_user_table(self):
         cur = self.conn.cursor()
-        with open(self.dataset_path + os.sep + 'user.json','r') as f:
+        with open(self.dataset_path + os.sep + 'user.json','r',encoding='utf8') as f:
             for line in f:
                 try:
                     data = json.loads(line)
@@ -89,7 +89,7 @@ class YelpDataImporter:
 
     def _populate_tip_table(self):
         cur = self.conn.cursor()
-        with open(self.dataset_path + os.sep + 'tip.json','r') as f:
+        with open(self.dataset_path + os.sep + 'tip.json','r',encoding='utf8') as f:
             for line in f:
                 try:
                     data = json.loads(line)
@@ -109,7 +109,7 @@ class YelpDataImporter:
 
     def _populate_checkin_table(self):
         cur = self.conn.cursor()
-        with open(self.dataset_path + os.sep + 'tip.json','r') as f:
+        with open(self.dataset_path + os.sep + 'tip.json','r',encoding='utf8') as f:
             for line in f:
                 try:
                     data = json.loads(line)
