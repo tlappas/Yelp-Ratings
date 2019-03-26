@@ -12,7 +12,7 @@ if __name__ == '__main__':
     parser.add_argument('-u', '--username', type=str, default='tlappas', help='User to access Postgres database. Default is \"tlappas\"')
     parser.add_argument('-w', '--password', type=str, default='', help='Password to access database. Default is empty. Password is not needed if current user can access db.')
     parser.add_argument('-d', '--dbname', type=str, default='yelp', help='Name of the Postgres database. Must exist. Default is \"yelp\"')
-    parser.add_argument('-p', '--path', type=str, default="""/home/tlappas/data_science/capstone/data""", help="""Location of the yelp json files. Default is \"/home/tlappas/data_science/capstone/data\"""")
+    parser.add_argument('-p', '--path', type=str, default="""./Yelp-Ratings/data/test""", help="""Location of the yelp json files. Default is \"./Yelp-Ratings/data/test\"""")
     parser.add_argument('-o', '--host', type=str, default="""/var/run/postgresql""", help="""Postgres host. Default is \"/var/run/postgresql\"""")
     parser.add_argument('-f', '--force', action='store_true', help='Drop an existing database with the same name. Default is \"False\".')
     parser.add_argument('-q', '--quiet', action='store_true', help='Suppress status updates in terminal. Default is \"False\".')
