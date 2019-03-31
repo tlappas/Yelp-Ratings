@@ -127,5 +127,18 @@ class YelpDataImporter:
         self.conn.commit()
         cur.close()
 
+    #@classmethod
+def print_status_bar(prefix, current, total, symbol = '=', width = 80):
+    completed = symbol * int(current*width/total)
+    remaining = ' ' * (width - int(current*width/total))
+    percent = int(current*100/total)
+    print(' {} {}{} | {:d}%'.format(prefix, completed, remaining, percent), end = '\r')
+    if current >= total:
+        print('')
+
 if __name__ == '__main__':
-    pass
+    import time
+    size = 75
+    for i in range(size):
+        print_status_bar('progress: ', i, size-1)
+        time.sleep(0.8)
