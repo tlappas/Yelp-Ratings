@@ -13,7 +13,7 @@ if __name__ == '__main__':
     parser.add_argument('-w', '--password', type=str, default='', help='Password to access database. Default is empty. Password is not needed if current user can access db.')
     parser.add_argument('-d', '--dbname', type=str, default='yelp', help='Name of the Postgres database. Must exist. Default is \"yelp\"')
     # Figure out the current path and get the path to test data.
-    parser.add_argument('-p', '--path', type=str, default="""./Yelp-Ratings/data/test""", help="""Location of the yelp json files. Default is \"./Yelp-Ratings/data/test\"""")
+    parser.add_argument('-p', '--path', type=str, default="""./Yelp-Ratings/data/test""", help="""Location of the yelp json files. Default is the yelp test data.")
     parser.add_argument('-o', '--host', type=str, default="""/var/run/postgresql""", help="""Postgres host. Default is \"/var/run/postgresql/\"""")
     parser.add_argument('-f', '--force', action='store_true', help='Drop an existing database with the same name. Default is \"False\".')
     parser.add_argument('-q', '--quiet', action='store_true', help='Suppress status updates in terminal. Default is \"False\".')
@@ -29,7 +29,7 @@ if __name__ == '__main__':
 
     conn = None
     try:
-        # There's a bug here with a poor workaround. If one of the variables is blank, it kills the rest of the format.
+        # There's a bug here with a poor workaround. If one of the variables is blank, it kills the rest of the format substitution.
         conn = psycopg2.connect('dbname={} user={} host={} password={}'.format(dbname, username, host, password))
         if force == False:
             print('Database {} already exists. If you\'d like to drop and recreate existing tables use --force.'.format(dbname))
