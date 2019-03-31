@@ -5,10 +5,11 @@ import datetime
 
 class YelpDataImporter:
 
-    def __init__(self, conn, datafiles, dataset_path):
+    def __init__(self, conn, datafiles, dataset_path, per_commit=1000):
         self.conn = conn
         self.datafiles = datafiles
         self.dataset_path = dataset_path
+        self.per_commit = per_commit
 
     def populate(self):
         if 'business.json' in self.datafiles:
@@ -30,7 +31,13 @@ class YelpDataImporter:
     # Not capturing attributes or hours. The JSON broke the query.
     def _populate_business_table(self):
         cur = self.conn.cursor()
+        n_processed = 0
+        total_rows = 0
+        # replace with os.path.join
         with open(self.dataset_path + os.sep + 'business.json','r',encoding='utf8') as f:
+            for line in f:
+                total_rows += 1
+            f.seek(0)
             for line in f:
                 try:
                     data = json.loads(line)
@@ -42,14 +49,21 @@ class YelpDataImporter:
                 try:
                     cur.execute("""
                         INSERT INTO business (business_id, name, address, city, state, postal_code, lat, long, stars, review_count, is_open, categories) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);""", (data['business_id'], data['name'], data['address'], data['city'], data['state'], data['postal_code'], data['latitude'], data['longitude'], str(data['stars']), data['review_count'], str(data['is_open']), data['categories']))
+                    n_processed += 1
+                    if n_processed % self.per_commit == 0:
+                        self.conn.commit()
+                        print_status_bar('business: ', n_processed, total_rows)
                 except psycopg2.Error as e:
                     print(e.pgerror)
+                    # Add logging and error handling
+                    #continue
         self.conn.commit()
+        print_status_bar('business: ', n_processed, total_rows)
         cur.close()
 
     def _populate_review_table(self):
         cur = self.conn.cursor()
-        with open(self.dataset_path + os.sep + 'review.json','r',encoding='utf8') as f:
+        with open(self.dataset_path + os.sep + 'review.json', 'r', encoding='utf8') as f:
             for line in f:
                 try:
                     data = json.loads(line)
@@ -127,5 +141,18 @@ class YelpDataImporter:
         self.conn.commit()
         cur.close()
 
+    #@classmethod
+def print_status_bar(prefix, current, total, symbol = '=', width = 80):
+    completed = symbol * int(current*width/total)
+    remaining = ' ' * (width - int(current*width/total))
+    percent = int(current*100/total)
+    print(' {} {}{} | {:d}%'.format(prefix, completed, remaining, percent), end = '\r')
+    if current >= total:
+        print('')
+
 if __name__ == '__main__':
-    pass
+    import time
+    size = 75
+    for i in range(size):
+        print_status_bar('progress: ', i, size-1)
+        time.sleep(0.8)

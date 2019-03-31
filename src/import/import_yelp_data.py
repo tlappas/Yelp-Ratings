@@ -12,8 +12,9 @@ if __name__ == '__main__':
     parser.add_argument('-u', '--username', type=str, default='tlappas', help='User to access Postgres database. Default is \"tlappas\"')
     parser.add_argument('-w', '--password', type=str, default='', help='Password to access database. Default is empty. Password is not needed if current user can access db.')
     parser.add_argument('-d', '--dbname', type=str, default='yelp', help='Name of the Postgres database. Must exist. Default is \"yelp\"')
+    # Figure out the current path and get the path to test data.
     parser.add_argument('-p', '--path', type=str, default="""./Yelp-Ratings/data/test""", help="""Location of the yelp json files. Default is \"./Yelp-Ratings/data/test\"""")
-    parser.add_argument('-o', '--host', type=str, default="""/var/run/postgresql""", help="""Postgres host. Default is \"/var/run/postgresql\"""")
+    parser.add_argument('-o', '--host', type=str, default="""/var/run/postgresql""", help="""Postgres host. Default is \"/var/run/postgresql/\"""")
     parser.add_argument('-f', '--force', action='store_true', help='Drop an existing database with the same name. Default is \"False\".')
     parser.add_argument('-q', '--quiet', action='store_true', help='Suppress status updates in terminal. Default is \"False\".')
 
@@ -21,31 +22,31 @@ if __name__ == '__main__':
     dbname = args.dbname
     username = args.username
     password = args.password
-    host = args.host
+    host = args.host.lower()
     dataset_path = args.path
     force = args.force
     quiet = args.quiet
 
     conn = None
     try:
-        conn = psycopg2.connect('dbname={} user={} password={} host={}'.format(dbname, username, password, host))
+        # There's a bug here with a poor workaround. If one of the variables is blank, it kills the rest of the format.
+        conn = psycopg2.connect('dbname={} user={} host={} password={}'.format(dbname, username, host, password))
         if force == False:
             print('Database {} already exists. If you\'d like to drop and recreate existing tables use --force.'.format(dbname))
             sys.exit()
     except psycopg2.Error:
-        conn = psycopg2.connect('dbname={} user={} password={} host={}'.format(username, username, password, host))
+        conn = psycopg2.connect('dbname={} user={} host={} password={}'.format(username, username, host, password))
         cur = conn.cursor()
         conn.set_session(autocommit=True)
         cur.execute('CREATE DATABASE {}'.format(dbname))
         cur.close()
         conn.close()
-        conn = psycopg2.connect('dbname={} user={} password={} host={}'.format(dbname, username, password, host))
+        conn = psycopg2.connect('dbname={} user={} host={} password={}'.format(dbname, username, host, password))
 
     out = sys.stdout
     if quiet == True:
         out = open(os.devnull, 'w')
 
-    #conn = psycopg2.connect('dbname=yelp user=tlappas host=/var/run/postgresql')
     cur = conn.cursor()
 
     # Get a list of all existing data files
