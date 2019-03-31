@@ -28,22 +28,18 @@ if __name__ == '__main__':
 
     conn = None
     try:
-        if password == '':
-            conn = psycopg2.connect('dbname=' + dbname + ' user=' + username + ' host=' + host)
-        else:
-            pdb.set_trace()
-            conn = psycopg2.connect('dbname=' + dbname + ' user=' + username + ' password=' + password + ' host=' + host)
+        conn = psycopg2.connect('dbname={} user={} password={} host={}'.format(dbname, username, password, host))
         if force == False:
             print('Database {} already exists. If you\'d like to drop and recreate existing tables use --force.'.format(dbname))
             sys.exit()
     except psycopg2.Error:
-        conn = psycopg2.connect('dbname=' + username + ' user=' + username + ' host=' + host)
+        conn = psycopg2.connect('dbname={} user={} password={} host={}'.format(username, username, password, host))
         cur = conn.cursor()
         conn.set_session(autocommit=True)
         cur.execute('CREATE DATABASE {}'.format(dbname))
         cur.close()
         conn.close()
-        conn = psycopg2.connect('dbname=' + dbname + ' user=' + username + ' host=' + host)
+        conn = psycopg2.connect('dbname={} user={} password={} host={}'.format(dbname, username, password, host))
 
     out = sys.stdout
     if quiet == True:
