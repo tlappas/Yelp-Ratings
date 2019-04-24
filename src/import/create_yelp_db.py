@@ -18,6 +18,7 @@ class YelpDBMaker:
         self._drop_existing_tables()
         if 'business.json' in self.datafiles:
             self._create_business_table()
+            self._create_attributes_table()
         if 'checkin.json' in self.datafiles:
             self._create_checkin_table()
         if 'review.json' in self.datafiles:
@@ -41,6 +42,15 @@ class YelpDBMaker:
             except psycopg2.Error as err:
                 print(err.pgerror)
                 self.conn.rollback()
+        try:
+            print('Dropping table attributes...')
+            cur.execute('DROP TABLE IF EXISTS attributes;')
+            self.conn.commit()
+        except psycopg2.Warning as warn:
+            print(warn.pgerror)
+        except psycopg2.Error as err:
+            print(err.pgerror)
+            self.conn.rollback()
 
     def _create_business_table(self):
         cur = self.conn.cursor()
@@ -57,9 +67,14 @@ class YelpDBMaker:
                 stars real,
                 review_count integer,
                 is_open boolean,
-                attributes json,
                 categories text,
-                hours json
+                hours_mon text,
+                hours_tues text,
+                hours_wed text,
+                hours_thurs text,
+                hours_fri text,
+                hours_sat text,
+                hours_sun text            
             );
         """)
         self.conn.commit()
@@ -136,6 +151,65 @@ class YelpDBMaker:
                 checkin_id serial PRIMARY KEY,
                 business_id char(22),
                 dates text
+            );
+        """)
+        self.conn.commit()
+        cur.close()
+
+    def _create_attributes_table(self):
+        cur = self.conn.cursor()
+        cur.execute("""
+            CREATE TABLE attributes (
+                business_id CHAR(22),
+                restaurants_price_range2 integer,
+                noise_level text,
+                restaurants_attire text,
+                alcohol text,
+                dj boolean,
+                background_music boolean,
+                jukebox boolean,
+                live boolean,
+                video boolean,
+                karaoke boolean,
+                no_music boolean,
+                dessert boolean,
+                latenight boolean,
+                lunch boolean,
+                dinner boolean,
+                brunch boolean,
+                breakfast boolean,
+                touristy boolean,
+                hipster boolean,
+                romantic boolean,
+                divey boolean,
+                intimate boolean,
+                trendy boolean,
+                upscale boolean,
+                classy boolean,
+                casual boolean,
+                garage boolean,
+                street boolean,
+                validated boolean,
+                lot boolean,
+                valet boolean,
+                by_appointment_only boolean,
+                happy_hour boolean,
+                business_accepts_creditcards boolean,
+                good_for_kids boolean,
+                caters boolean,
+                restaurants_table_service boolean,
+                business_accepts_bitcoin boolean,
+                accepts_insurance boolean,
+                bike_parking boolean,
+                restaurants_reservations boolean,
+                outdoor_seating boolean,
+                wifi text,
+                hastv boolean,
+                restaurants_take_out boolean,
+                restaurants_delivery boolean,
+                restaurants_good_for_groups boolean,
+                dogs_allowed boolean,
+                wheelchair_accessible boolean
             );
         """)
         self.conn.commit()
