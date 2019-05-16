@@ -1,7 +1,7 @@
 import nltk
 nltk.download()
 
-def create_stop_words(data):
+def _create_stop_words():
 
 	stops = nltk.corpus.stopwords.words('english')
 
@@ -137,8 +137,9 @@ def create_stop_words(data):
    		if x in stops:
     		stops.remove(x)
         
-	new_stops = stops + common_nonneg_contr
-	list(set(new_stops))
+	new_stops = stops + common_nonneg_contr + ['']
+	stops = list(set(new_stops))
+    return stops
 
 if __name__ == '__main__':
     pass
