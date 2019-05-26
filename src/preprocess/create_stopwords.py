@@ -134,7 +134,7 @@ letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
 
 ranks = ['st', 'nd', 'rd', 'th']
 
-def create_stopword_list():
+def create_stopword_list(nltk_english = True, contractions = True, single_letters = True, rank_suffixes = True, remove_negs = True):
 
 	# Figure out if the stopwords corpus is present
 	try:
@@ -143,9 +143,19 @@ def create_stopword_list():
 		nltk.download('stopwords')
 
 	# Assemble all the stopwords into a list
-	stops = nltk.corpus.stopwords.words('english') + common_nonneg_contr + letters + ranks + [""] + ['us'] + [''] + ["'"]
+	stops = []
+	if nltk_english:
+		stops += nltk.corpus.stopwords.words('english')
+	if contractions:
+		stops += common_nonneg_contr
+	if single_letters:
+		stops += letters
+	if rank_suffixes:
+		stops += ranks
+	stops += [""] + ['us'] + [''] + ["'"]
 
 	# Remove all negative stopwords and any duplicates
-	stops = list(set(stops) - set(neg_stops))
+	if remove_negs:
+		stops = list(set(stops) - set(neg_stops))
 
 	return stops
