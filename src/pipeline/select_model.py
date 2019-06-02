@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import time
 import pandas
+import pickle
 
 from sklearn.metrics import f1_score
 from sklearn.metrics import accuracy_score
@@ -19,7 +20,7 @@ from sklearn.svm import SVC
 
 import build_train_test
 
-data_path = """C:\Users\tom.lappas\code\Yelp-Ratings\data\processed"""
+data_path = 'C:\\Users\\tom.lappas\\code\\Yelp-Ratings\\data\\processed'
 
 classifiers = [
     KNeighborsClassifier(),
@@ -45,8 +46,8 @@ print('Loading data.')
 #[x_train, x_test, y_train, y_test] = build_train_test.split(data.loc[:,'processed_text'], data.loc[:,'stars'], save_data=False)
 
 # Load train/test data with labels attaached
-[x_train, y_train] = pickle.load(open('train.pkl','rb'))
-[x_test, y_test] = pickle.load(open('test.pkl','rb'))
+[x_train, y_train] = pickle.load(open(os.path.join(data_path,'train.pkl'),'rb'))
+[x_test, y_test] = pickle.load(open(os.path.join(data_path,'test.pkl'),'rb'))
 
 # Transform
 print('Transform the datasets into tf-idf sparse arrays.')
