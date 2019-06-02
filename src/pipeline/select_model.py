@@ -49,10 +49,12 @@ x_train = TfidfVectorizer(ngram_range=(1,2)).fit_transform(x_train)
 x_test = TfidfVectorizer(ngram_range=(1,2)).fit_transform(x_test)
 
 # Print data info
-print('Number of Instances: {}\n'.format(data.shape[0]))
+print('Number of Instances: {}'.format(data.shape[0]))
+print('\tTraining instances: {}'.format(x_train.shape[0]))
+print('\tTesting instances: {}\n'.format(x_test.shape[0]))
 
 strat_kfold = ms.StratifiedKFold(n_splits=5, shuffle=True)
-print('Cross-validation: {} folds'.format(strat_kfold.get_n_splits))
+print('Cross-validation: {} folds\n'.format(strat_kfold.get_n_splits))
 
 for estimator in classifiers:
 
