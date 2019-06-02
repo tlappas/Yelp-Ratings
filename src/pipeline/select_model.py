@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 import time
+import pandas
 
 from sklearn.metrics import f1_score
 from sklearn.metrics import accuracy_score
@@ -42,6 +43,10 @@ data = build_train_test.join_labels(data, 'yelp', 'tlappas', '/var/run/postgresq
 # Split into training and testing
 print('Split data into train and test sets.')
 [x_train, x_test, y_train, y_test] = build_train_test.split(data.loc[:,'processed_text'], data.loc[:,'stars'], save_data=False)
+
+# Load train/test data with labels attaached
+#[x_train, y_train] = pickle.load(open('train.pkl','rb'))
+#[x_test, y_test] = pickle.load(open('test.pkl','rb'))
 
 # Transform
 print('Transform the datasets into tf-idf sparse arrays.')
