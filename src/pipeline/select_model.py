@@ -55,7 +55,7 @@ x_train = TfidfVectorizer(ngram_range=(1,2)).fit_transform(x_train)
 x_test = TfidfVectorizer(ngram_range=(1,2)).fit_transform(x_test)
 
 # Print data info
-print('Number of Instances: {}'.format(data.shape[0]))
+#print('Number of Instances: {}'.format(data.shape[0]))
 print('\tTraining instances: {}'.format(x_train.shape[0]))
 print('\tTesting instances: {}\n'.format(x_test.shape[0]))
 
