@@ -19,7 +19,7 @@ from sklearn.svm import SVC
 
 import build_train_test
 
-data_path = '/home/tlappas/data_science/Yelp-Ratings/data/processed/processed_alice'
+data_path = """C:\Users\tom.lappas\code\Yelp-Ratings\data\processed"""
 
 classifiers = [
     KNeighborsClassifier(),
@@ -33,20 +33,20 @@ classifiers = [
 
 # Import Data
 print('Loading data.')
-data = build_train_test.load_batch_data(1, data_path)
-print('Convert word lists into strings.')
-data['processed_text'] = data['processed_text'].apply(' '.join)
+#data = build_train_test.load_batch_data(1, data_path)
+#print('Convert word lists into strings.')
+#data['processed_text'] = data['processed_text'].apply(' '.join)
 # Get Labels
-data = build_train_test.join_labels(data, 'yelp', 'tlappas', '/var/run/postgresql/', 'SYK&kI#4')
+#data = build_train_test.join_labels(data, 'yelp', 'tlappas', '/var/run/postgresql/', '')
 # Set Class labels
 # data.apply(data.loc[:,'stars'], build_train_test.remap_labels([1,2,3,4,5], [1,2,3,4,5]))
 # Split into training and testing
-print('Split data into train and test sets.')
-[x_train, x_test, y_train, y_test] = build_train_test.split(data.loc[:,'processed_text'], data.loc[:,'stars'], save_data=False)
+#print('Split data into train and test sets.')
+#[x_train, x_test, y_train, y_test] = build_train_test.split(data.loc[:,'processed_text'], data.loc[:,'stars'], save_data=False)
 
 # Load train/test data with labels attaached
-#[x_train, y_train] = pickle.load(open('train.pkl','rb'))
-#[x_test, y_test] = pickle.load(open('test.pkl','rb'))
+[x_train, y_train] = pickle.load(open('train.pkl','rb'))
+[x_test, y_test] = pickle.load(open('test.pkl','rb'))
 
 # Transform
 print('Transform the datasets into tf-idf sparse arrays.')
