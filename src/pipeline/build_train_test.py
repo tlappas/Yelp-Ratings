@@ -44,7 +44,7 @@ def join_labels(data, dbname, username, host, password):
 def load_batch_data(n_batches, path=''):
     data = pd.DataFrame()
     for batch in range(n_batches):
-        with open(os.path.join(path,'batch_{}.pkl'.format(batch+1)), 'rb') as f:
+        with open(os.path.join(path,'batch_{}_final.pkl'.format(batch+1)), 'rb') as f:
             pickled_data = pickle.load(f)
             data = pd.concat([data, pickled_data[0]], axis=1)
 
