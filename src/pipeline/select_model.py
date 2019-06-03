@@ -23,17 +23,17 @@ import build_train_test
 data_path = 'C:\\Users\\tom.lappas\\code\\Yelp-Ratings\\data\\processed'
 
 classifiers = [
-    KNeighborsClassifier(),
-    SVC(),
     RandomForestClassifier(max_depth=5), # Random Forest documentation recommends setting a default max_depth so trees don't become enormous.
     AdaBoostClassifier(),
     GaussianNB(),
     MultinomialNB(),
-    BaggingClassifier()
+    BaggingClassifier(),
+    KNeighborsClassifier(n_neighbors=3),
+    SVC(kernel='linear')
 ]
 
 # Import Data
-print('Loading data.')
+#print('Loading data.')
 #data = build_train_test.load_batch_data(1, data_path)
 #print('Convert word lists into strings.')
 #data['processed_text'] = data['processed_text'].apply(' '.join)
@@ -43,24 +43,36 @@ print('Loading data.')
 # data.apply(data.loc[:,'stars'], build_train_test.remap_labels([1,2,3,4,5], [1,2,3,4,5]))
 # Split into training and testing
 #print('Split data into train and test sets.')
-#[x_train, x_test, y_train, y_test] = build_train_test.split(data.loc[:,'processed_text'], data.loc[:,'stars'], save_data=False)
+#[x_train, x_test, y_train, y_test] = build_train_test.split(data.loc[:,'processed_text'], data.loc[:,'stars'], save_data=True)
 
-# Load train/test data with labels attaached
+# Load train/test data with labels attached
+print('Load Train/Test data.')
 [x_train, y_train] = pickle.load(open(os.path.join(data_path,'train.pkl'),'rb'))
 [x_test, y_test] = pickle.load(open(os.path.join(data_path,'test.pkl'),'rb'))
 
 # Transform
 print('Transform the datasets into tf-idf sparse arrays.')
-x_train = TfidfVectorizer(ngram_range=(1,2)).fit_transform(x_train)
-x_test = TfidfVectorizer(ngram_range=(1,2)).fit_transform(x_test)
+tfidfer = TfidfVectorizer(ngram_range=(1,2)).fit(x_train)
+x_train = tfidfer.transform(x_train)
+x_test = tfidfer.transform(x_test)
+
+# Save TF-IDF vectors so I'm not recalculating them every time...
+print('Save the TF-IDFed data.\n')
+pickle.dump([x_train, y_train], open(os.path.join(data_path, 'tfidfed-train.pkl'), 'wb'))
+pickle.dump([x_test, y_test], open(os.path.join(data_path, 'tfidfed-test.pkl'), 'wb'))
+
+# Load TF-IDFed train/test data with labels attached
+#print('Load TF-IDFed Train/Test data.')
+#[x_train, y_train] = pickle.load(open(os.path.join(data_path,'tfidfed-train.pkl'),'rb'))
+#[x_test, y_test] = pickle.load(open(os.path.join(data_path,'tfidfed-test.pkl'),'rb'))
 
 # Print data info
 #print('Number of Instances: {}'.format(data.shape[0]))
-print('\tTraining instances: {}'.format(x_train.shape[0]))
-print('\tTesting instances: {}\n'.format(x_test.shape[0]))
+print('\tTraining instances: {}'.format(x_train.shape))
+print('\tTesting instances: {}\n'.format(x_test.shape))
 
 strat_kfold = ms.StratifiedKFold(n_splits=5, shuffle=True)
-print('Cross-validation: {} folds\n'.format(strat_kfold.get_n_splits))
+print('Cross-validation: {} folds\n'.format(strat_kfold.get_n_splits()))
 
 for estimator in classifiers:
 
@@ -80,7 +92,7 @@ for estimator in classifiers:
     elapsed = time_stop - time_start
     print('{} minutes {} seconds'.format(elapsed // 60, elapsed % 60))
     print('\tTraining Accuracy Score: {}'.format(accuracy_score(train_predictions, y_train)))
-    print('\tTraining F1 Score: {}\n'.format(f1_score(train_predictions, y_train)))
+    print('\tTraining F1 Score: {}\n'.format(f1_score(train_predictions, y_train, average='micro')))
 
     # Predict on test dataset
     print('{} predict testing - '.format(estimator.__class__.__name__), end='')
@@ -90,5 +102,5 @@ for estimator in classifiers:
     elapsed = time_stop - time_start
     print('{} minutes {} seconds'.format(elapsed // 60, elapsed % 60))
     print('\tTesting Accuracy Score: {}'.format(accuracy_score(test_predictions, y_test)))
-    print('\tTesting F1 Score: {}'.format(f1_score(test_predictions, y_test)))
+    print('\tTesting F1 Score: {}'.format(f1_score(test_predictions, y_test, average='micro')))
     print('\n')
