@@ -108,8 +108,8 @@ for estimator in classifiers:
     time_stop = time.time()
     elapsed = time_stop - time_start
     print('{} minutes {} seconds'.format(elapsed // 60, elapsed % 60))
-    print('\tTraining Accuracy Score: {}'.format(accuracy_score(train_predictions, y_train)))
-    print('\tTraining F1 Score: {}\n'.format(f1_score(train_predictions, y_train, average='micro')))
+    print('\tTraining Accuracy Score: {}'.format(accuracy_score(y_train, train_predictions)))
+    print('\tTraining F1 Score: {}\n'.format(f1_score(y_train, train_predictions, average='micro')))
 
     # Predict on test dataset
     print('{} predict testing - '.format(estimator.__class__.__name__), end='')
@@ -118,6 +118,6 @@ for estimator in classifiers:
     time_stop = time.time()
     elapsed = time_stop - time_start
     print('{} minutes {} seconds'.format(elapsed // 60, elapsed % 60))
-    print('\tTesting Accuracy Score: {}'.format(accuracy_score(test_predictions, y_test)))
-    print('\tTesting F1 Score: {}'.format(f1_score(test_predictions, y_test, average='micro')))
+    print('\tTesting Accuracy Score: {}'.format(accuracy_score(y_test, test_predictions)))
+    print('\tTesting F1 Score: {}'.format(f1_score(y_test, test_predictions, average='micro')))
     print('\n')
