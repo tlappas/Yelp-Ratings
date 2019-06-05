@@ -1,0 +1,43 @@
+UPDATE attributes
+SET noise_level = 'quiet'
+WHERE noise_level = '''quiet''' OR noise_level = 'u''quiet''';
+UPDATE attributes
+SET noise_level = 'average'
+WHERE noise_level = '''average''' OR noise_level = 'u''average''';
+UPDATE attributes
+SET noise_level = 'loud'
+WHERE noise_level = '''loud''' OR noise_level = 'u''loud''';
+UPDATE attributes
+SET noise_level = 'very_loud'
+WHERE noise_level = '''very_loud''' OR noise_level = 'u''very_loud''';
+
+UPDATE attributes
+SET restaurants_attire = 'casual'
+WHERE restaurants_attire = '''casual''' OR restaurants_attire = 'u''casual''';
+UPDATE attributes
+SET restaurants_attire = 'dressy'
+WHERE restaurants_attire = '''dressy''' OR restaurants_attire = 'u''dressy''';
+UPDATE attributes
+SET restaurants_attire = 'formal'
+WHERE restaurants_attire = '''formal''' OR restaurants_attire = 'u''formal''';
+
+UPDATE attributes
+SET alcohol = 'none'
+WHERE alcohol = '''none''' OR alcohol = 'u''none''';
+UPDATE attributes
+SET alcohol = 'full_bar'
+WHERE alcohol = '''full_bar''' OR alcohol = 'u''full_bar''';
+UPDATE attributes
+SET alcohol = 'beer_and_wine'
+WHERE alcohol = '''beer_and_wine''' OR alcohol = 'u''beer_and_wine''';
+
+UPDATE attributes
+SET wifi = 'no'
+WHERE wifi = '''no''' OR wifi = 'u''no''';
+UPDATE attributes
+SET wifi = 'free'
+WHERE wifi = '''free''' OR wifi = 'u''free''';
+UPDATE attributes
+SET wifi = 'paid'
+WHERE wifi = '''paid''' OR wifi = 'u''paid''';
+
