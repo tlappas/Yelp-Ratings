@@ -1,55 +1,51 @@
 import nltk
-nltk.download()
 
-def _create_stop_words():
+# Define stopword lists
+neg_stops = ['no',
+	'nor',
+	'not',
+	'don',
+	"don't",
+	'ain',
+	'aren',
+	"aren't",
+	'couldn',
+	"couldn't",
+	'didn',
+	"didn't",
+	'doesn',
+	"doesn't",
+	'hadn',
+	"hadn't",
+	'hasn',
+	"hasn't",
+	'haven',
+	"haven't",
+	'isn',
+	"isn't",
+	'mightn',
+	"mightn't",
+	'mustn',
+	"mustn't",
+	'needn',
+	"needn't",
+	'shan',
+	"shan't",
+	'shouldn',
+	"shouldn't",
+	'wasn',
+	"wasn't",
+	'weren',
+	"weren't",
+	"won'",
+	"won't",
+	'wouldn',
+	"wouldn't",
+	'but',
+	"don'",
+	"ain't"]
 
-	stops = nltk.corpus.stopwords.words('english')
-
-	neg_stops = ['no',
- 	'nor',
- 	'not',
- 	'don',
- 	"don't",
- 	'ain',
- 	'aren',
- 	"aren't",
- 	'couldn',
- 	"couldn't",
- 	'didn',
- 	"didn't",
- 	'doesn',
- 	"doesn't",
- 	'hadn',
- 	"hadn't",
- 	'hasn',
- 	"hasn't",
- 	'haven',
- 	"haven't",
- 	'isn',
- 	"isn't",
- 	'mightn',
- 	"mightn't",
- 	'mustn',
- 	"mustn't",
- 	'needn',
- 	"needn't",
- 	'shan',
- 	"shan't",
- 	'shouldn',
- 	"shouldn't",
- 	'wasn',
- 	"wasn't",
- 	'weren',
- 	"weren't",
- 	"won'",
- 	"won't",
- 	'wouldn',
- 	"wouldn't",
- 	'but',
- 	"don'",
- 	"ain't"]
-
-	common_nonneg_contr = ["could've",
+common_nonneg_contr = ["could've",
 	"he'd",
 	"he'd've",
 	"he'll",
@@ -133,13 +129,33 @@ def _create_stop_words():
 	"you're",
 	"you've"]
 
-	for x in neg_stops:
-   		if x in stops:
-    		stops.remove(x)
-        
-	new_stops = stops + common_nonneg_contr + ['']
-	stops = list(set(new_stops))
-    return stops
+letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
+  'u', 'v', 'w', 'x', 'y', 'z']
 
-if __name__ == '__main__':
-    pass
+ranks = ['st', 'nd', 'rd', 'th']
+
+def create_stopword_list(nltk_english = True, contractions = True, single_letters = True, rank_suffixes = True, remove_negs = True):
+
+	# Figure out if the stopwords corpus is present
+	try:
+		dir(nltk.corpus.stopwords)
+	except AttributeError:
+		nltk.download('stopwords')
+
+	# Assemble all the stopwords into a list
+	stops = []
+	if nltk_english:
+		stops += nltk.corpus.stopwords.words('english')
+	if contractions:
+		stops += common_nonneg_contr
+	if single_letters:
+		stops += letters
+	if rank_suffixes:
+		stops += ranks
+	stops += [""] + ['us'] + [''] + ["'"]
+
+	# Remove all negative stopwords and any duplicates
+	if remove_negs:
+		stops = list(set(stops) - set(neg_stops))
+
+	return stops
