@@ -32,15 +32,30 @@ classifiers = [
     SVC(kernel='linear')
 ]
 
+#Different choices for remapping label data. Default is 'A', or [1,2,3,4,5]
+class_combos = {
+'A': [1,2,3,4,5],
+'B': [[1], [2,3,4], [5]], 
+'C': [[1,2], [4,5]], 
+'D': [[1,2,3], [4,5]],
+'E': [[1,2,3,4], [5]],
+'F': [[1,2], [3,4], [5]],
+'G': [[1], [5]],
+'H': [[1,2], [4,5]]
+}
+
+
 # Import Data
 #print('Loading data.')
 #data = build_train_test.load_batch_data(1, data_path)
+#print('Create token_count column.')
+#data.loc[:,'token_count'] = data.loc[:, 'processed_text'].apply(lambda x: len(x))
 #print('Convert word lists into strings.')
 #data['processed_text'] = data['processed_text'].apply(' '.join)
 # Get Labels
 #data = build_train_test.join_labels(data, 'yelp', 'tlappas', '/var/run/postgresql/', '')
 # Set Class labels
-# data.apply(data.loc[:,'stars'], build_train_test.remap_labels([1,2,3,4,5], [1,2,3,4,5]))
+#data = build_train_test.remap_labels(data, class_combo = 'A')
 # Split into training and testing
 #print('Split data into train and test sets.')
 #[x_train, x_test, y_train, y_test] = build_train_test.split(data.loc[:,'processed_text'], data.loc[:,'stars'], save_data=True)
