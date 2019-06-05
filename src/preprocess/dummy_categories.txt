@@ -1,0 +1,253 @@
+
+ALTER TABLE business 
+ADD COLUMN automotive_dummy integer,
+ADD COLUMN active_life_dummy integer,
+ADD COLUMN arts_and_entertainment_dummy integer,
+ADD COLUMN beauty_spa_dummy integer,
+ADD COLUMN bicycle_dummy integer,
+ADD COLUMN education_dummy integer,
+ADD COLUMN event_planning_dummy integer,
+ADD COLUMN financial_services integer,
+ADD COLUMN food_dummy integer,
+ADD COLUMN health_dummy integer,
+ADD COLUMN home_service_dummy integer,
+ADD COLUMN hotel_dummy integer,
+ADD COLUMN local_flavor_dummy integer,
+ADD COLUMN local_services_dummy integer,
+ADD COLUMN media_dummy integer,
+ADD COLUMN nightlife_dummy integer,
+ADD COLUMN pets_dummy integer,
+ADD COLUMN professional_dummy integer,
+ADD COLUMN government_dummy integer,
+ADD COLUMN real_estate_dummy integer,
+ADD COLUMN religious_dummy integer,
+ADD COLUMN restaurant_dummy integer,
+ADD COLUMN shopping_dummy integer,
+ADD COLUMN null_dummy integer; commit;
+
+
+UPDATE business
+SET automotive_dummy =
+CASE
+	WHEN business.categories LIKE '%Automotive%' 
+	THEN 1
+	ELSE 0
+END; commit;
+
+
+UPDATE business
+SET active_life_dummy =
+CASE
+	WHEN business.categories LIKE '%Active Life%' 
+	THEN 1
+	ELSE 0
+END; commit;
+
+
+UPDATE business
+SET arts_and_entertainment_dummy =
+CASE
+	WHEN business.categories LIKE '%Arts & Entertainment%' 
+	THEN 1
+	ELSE 0
+END; commit;
+
+
+UPDATE business
+SET beauty_spa_dummy =
+CASE
+	WHEN business.categories LIKE '%Beauty & Spas%' 
+	THEN 1
+	ELSE 0
+END; commit;
+
+
+UPDATE business
+SET bicycle_dummy =
+CASE
+	WHEN business.categories LIKE '%Bicycles%' 
+	THEN 1
+	ELSE 0
+END; commit;
+
+
+UPDATE business
+SET education_dummy =
+CASE
+	WHEN business.categories LIKE '%Education%' 
+	THEN 1
+	ELSE 0
+END; commit;
+
+
+UPDATE business
+SET event_planning_dummy =
+CASE
+	WHEN business.categories LIKE '%Event Planning & Services%' 
+	THEN 1
+	ELSE 0
+END; commit;
+
+
+UPDATE business
+SET financial_services =
+CASE
+	WHEN business.categories LIKE '%Financial Services%' 
+	THEN 1
+	ELSE 0
+END; commit;
+
+	
+UPDATE business
+SET food_dummy =
+CASE
+	WHEN business.categories LIKE '%, Food,%'
+	OR business.categories LIKE 'Food,%'
+	OR business.categories LIKE '%, Food'
+	OR business.categories = 'Food' 
+	THEN 1
+	ELSE 0
+END; commit;
+
+
+UPDATE business
+SET health_dummy =
+CASE
+	WHEN business.categories LIKE '%Health & Medical%' 
+	THEN 1
+	ELSE 0
+END; commit;
+
+
+UPDATE business
+SET home_service_dummy =
+CASE
+	WHEN business.categories LIKE '%Home Services%' 
+	THEN 1
+	ELSE 0
+END; commit;
+
+
+UPDATE business
+SET hotel_dummy =
+CASE
+	WHEN business.categories LIKE '%Hotels & Travel%' 
+	THEN 1
+	ELSE 0
+END; commit;
+
+
+UPDATE business
+SET local_flavor_dummy =
+CASE
+	WHEN business.categories LIKE '%Local Flavor%' 
+	THEN 1
+	ELSE 0
+END; commit;
+
+
+UPDATE business
+SET local_services_dummy =
+CASE
+	WHEN business.categories LIKE '%Local Services%' 
+	THEN 1
+	ELSE 0
+END; commit;
+
+
+UPDATE business
+SET media_dummy =
+CASE
+	WHEN business.categories LIKE '%Mass Media%' 
+	THEN 1
+	ELSE 0
+END; commit;
+
+
+UPDATE business
+SET nightlife_dummy =
+CASE
+	WHEN business.categories LIKE '%Nightlife%' 
+	THEN 1
+	ELSE 0
+END; commit;
+
+
+UPDATE business
+SET pets_dummy =
+CASE
+	WHEN business.categories LIKE '%Pets%' 
+	THEN 1
+	ELSE 0
+END; commit;
+
+
+UPDATE business
+SET professional_dummy =
+CASE
+	WHEN business.categories LIKE '%Professional Services%' 
+	THEN 1
+	ELSE 0
+END; commit;
+
+
+UPDATE business
+SET government_dummy =
+CASE
+	WHEN business.categories LIKE '%Public Services & Government%' 
+	THEN 1
+	ELSE 0
+END; commit;
+
+
+UPDATE business
+SET real_estate_dummy =
+CASE
+	WHEN business.categories LIKE 'Real Estate,%' 
+	OR business.categories LIKE '%, Real Estate'
+	OR business.categories LIKE '%, Real Estate,%'
+	OR business.categories = 'Real Estate'
+	THEN 1
+	ELSE 0
+END; commit;
+
+
+UPDATE business
+SET religious_dummy =
+CASE
+	WHEN business.categories LIKE '%Religious Organizations%' 
+	THEN 1
+	ELSE 0
+END; commit;
+
+
+UPDATE business
+SET restaurant_dummy =
+CASE
+	WHEN business.categories LIKE '%, Restaurants,%' 
+	OR business.categories LIKE 'Restaurants,%'
+	OR business.categories LIKE '%, Restaurants'
+	OR business.categories = 'Restaurants'
+	THEN 1
+	ELSE 0
+END; commit;
+
+
+UPDATE business
+SET shopping_dummy =
+CASE
+	WHEN business.categories LIKE '%, Shopping,%'
+	OR business.categories LIKE 'Shopping,%'
+	OR business.categories LIKE '%, Shopping'
+	OR business.categories = 'Shopping'
+	THEN 1
+	ELSE 0
+END; commit;
+
+UPDATE business
+SET null_dummy =
+CASE
+	WHEN business.categories is null
+	Then 1
+	ELSE 0
+END; commit;
