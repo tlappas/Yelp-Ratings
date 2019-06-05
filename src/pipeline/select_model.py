@@ -56,6 +56,8 @@ class_combos = {
 #data = build_train_test.join_labels(data, 'yelp', 'tlappas', '/var/run/postgresql/', '')
 # Set Class labels
 #data = build_train_test.remap_labels(data, class_combo = 'A')
+#Balance classes
+#data = build_train_test.balance_classes(data)
 # Split into training and testing
 #print('Split data into train and test sets.')
 #[x_train, x_test, y_train, y_test] = build_train_test.split(data.loc[:,'processed_text'], data.loc[:,'stars'], save_data=True)
