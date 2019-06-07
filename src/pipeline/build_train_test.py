@@ -102,13 +102,32 @@ def join_labels(data, dbname, username, host, password):
     conn = psycopg2.connect('dbname={} user={} host={} password={}'.format(dbname, username, host, password))
     cur = conn.cursor()
     cur.execute("""
-        SELECT review_id, stars FROM review;
+        SELECT review_id, business_id, stars FROM review;
     """)
-    labels = pd.DataFrame(cur.fetchall(), columns=['review_id','stars'])
+    labels = pd.DataFrame(cur.fetchall(), columns=['review_id', 'business_id', 'stars'])
     # convert stars to int8 to reduce memory usage
     labels.loc[:,'stars'] = pd.to_numeric(labels.loc[:,'stars'], 'coerce').fillna(0).astype(np.int8)
     # Inner join with the processed text data
     return pd.merge(data, labels, how='inner', on='review_id', sort=False)
+
+def join_categories(data, dbname, username, host, password):
+    conn = psycopg2.connect('dbname={} user={} host={} password={}'.format(dbname, username, host, password))
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT business_id, automotive_dummy, active_life_dummy, arts_and_entertainment_dummy, beauty_spa_dummy, bicycle_dummy, education_dummy, event_planning_dummy, financial_services, food_dummy, health_dummy, home_service_dummy, hotel_dummy, local_flavor_dummy, local_services_dummy, media_dummy, nightlife_dummy, pets_dummy, professional_dummy, government_dummy, real_estate_dummy, religious_dummy, restaurant_dummy, shopping_dummy, null_dummy FROM business;
+    """)
+    attributes = pd.DataFrame(cur.fetchall(), columns=['business_id', 'automotive_dummy', 'active_life_dummy', 'arts_and_entertainment_dummy', 'beauty_spa_dummy', 'bicycle_dummy', 'education_dummy', 'event_planning_dummy', 'financial_services', 'food_dummy', 'health_dummy', 'home_service_dummy', 'hotel_dummy', 'local_flavor_dummy', 'local_services_dummy', 'media_dummy', 'nightlife_dummy', 'pets_dummy', 'professional_dummy', 'government_dummy', 'real_estate_dummy', 'religious_dummy', 'restaurant_dummy', 'shopping_dummy', 'null_dummy'])
+    return pd.merge(data, attributes, how='inner', on='business_id', sort=False)
+
+def join_price_range(data, dbname, username, host, password):
+    conn = psycopg2.connect('dbname={} user={} host={} password={}'.format(dbname, username, host, password))
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT business_id, restaurants_price_range2 FROM attributes where restaurants_price_range2 is not null;
+    """)
+    price_data = pd.DataFrame(cur.fetchall(), columns=['business_id','restaurants_price_range2'])
+    # Inner join with the processed text data
+    return pd.merge(data, price_data, how='inner', on='business_id', sort=False)
 
 # (Sequentially) loads n_blocks pickle files of Alice's processed data
 def load_batch_data(n_batches, path=''):
