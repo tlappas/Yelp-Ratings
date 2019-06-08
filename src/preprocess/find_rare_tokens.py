@@ -48,6 +48,6 @@ rare_tokens_30 = _infrequent_tokens_list(processed_reviews['processed_text'], 30
 print('Rare tokens list created\n')
 
 print('Pickling rare tokens list\n')
-with open(os.path.join(data_path, 'rare_tokens_threshold30.pkl'), 'wb') as f:
+with open('rare_tokens_threshold30.pkl', 'wb') as f:
     pickle.dump(rare_tokens_30, f)
 print('Finished pickling rare tokens')
