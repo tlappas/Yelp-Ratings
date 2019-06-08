@@ -7,15 +7,18 @@ from collections import Counter
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-p', '--path', type=str, default='/Users/alice.naghshineh/Desktop/pickled_data/threshold_analysis/original_batches', help='Path to folder where previously pickled review data from (clean_text.py) and rare tokens (from find_rare_tokens.py) are stored. Default is \"/Users/alice.naghshineh/Desktop/pickled_data/threshold_analysis/original_batches\"')
+parser.add_argument('-p', '--path', type=str, default='/Users/alice.naghshineh/Desktop/pickled_data/threshold_analysis/original_batches', help='Path to folder where previously pickled review data from (clean_text.py) are stored. Default is \"/Users/alice.naghshineh/Desktop/pickled_data/threshold_analysis/original_batches\"')
 parser.add_argument('-pn', '--progress_number', type=int, default=1000, help='Set this number N for code to update you every time N number of reviews have been processed. Default is \"10000\"')
 
 args = parser.parse_args()
 data_path = args.path
 progress_number = args.progress_number
 
-with open(os.path.join(data_path, 'rare_tokens_threshold30.pkl'), 'rb') as f:
+with open('rare_tokens_threshold30.pkl', 'rb') as f:
     rare_tokens_30 = pickle.load(f)
+
+if len(rare_tokens_30) == 583595:
+    print('Rare tokens list retrieved')
 
 def _remove_rare_tokens(tokens):   
     tokens_to_remove = list((set(tokens) & set(rare_tokens_30)))
@@ -39,7 +42,7 @@ def apply_on_column(data, progress_number):
 
 #Process (remove rare tokens) and pickle the data in 5 batches again
 for batch in ['batch_1', 'batch_2', 'batch_3', 'batch_4', 'batch_5']:
-    print("\nStarting to clean {} review data...\n".format(batch))
+    print("\nStarting to remove rare tokens from {} review data...\n".format(batch))
     file = "{}.pkl".format(batch)
     with open(os.path.join(data_path, file), 'rb') as f:
         pickled_data = pickle.load(f)
