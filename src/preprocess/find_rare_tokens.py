@@ -3,10 +3,13 @@ import pickle
 import os
 from sklearn.feature_extraction.text import CountVectorizer
 from collections import Counter
+import argparse
 
+parser = argparse.ArgumentParser()
+parser.add_argument('-p', '--path', type=str, default='/Users/alice.naghshineh/Desktop/pickled_data/threshold_analysis/original_batches', help='Path to folder where previously pickled review data from (clean_text.py) are stored. Default is \"/Users/alice.naghshineh/Desktop/pickled_data/threshold_analysis/original_batches\"')
 
-#Change data path below to path leading to where previously pickled text data was saved
-data_path = '/Users/alice.naghshineh/Desktop/pickled_data/threshold_analysis/original_batches'
+args = parser.parse_args()
+data_path = args.path
 
 def load_batch_data(n_batches=5, path= data_path):
     data = pd.DataFrame()
@@ -14,6 +17,7 @@ def load_batch_data(n_batches=5, path= data_path):
         with open(os.path.join(path,'batch_{}.pkl'.format(batch+1)), 'rb') as f:
             pickled_data = pickle.load(f)
             data = pd.concat([data, pickled_data[0]], ignore_index=True)
+        print('batch_{} loaded\n'.format(batch+1))
 
     return data
 
@@ -38,7 +42,7 @@ print('\nLoading in previously pickled review data...\n')
 processed_reviews = load_batch_data(5)
 print('Loading finished\n')
 
-print('Creating list of rare tokens with threshold 30...\n')
+print('Creating list of rare tokens with threshold 30 (appear at most 30 times in corpus)...\n')
 #Create list of all tokens that appear 30 or less times in the corpus
 rare_tokens_30 = _infrequent_tokens_list(processed_reviews['processed_text'], 30)
 print('Rare tokens list created\n')
