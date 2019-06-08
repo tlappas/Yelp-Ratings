@@ -6,6 +6,8 @@ import pickle
 
 from sklearn.metrics import f1_score
 from sklearn.metrics import accuracy_score
+from sklearn.metrics import confusion_matrix
+
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.pipeline import Pipeline
 
@@ -16,27 +18,29 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.ensemble import BaggingClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import SGDClassifier
 from sklearn.svm import SVC
+from sklearn.svm import LinearSVC
 
 import build_train_test
 
-data_path = 'C:\\Users\\tom.lappas\\code\\Yelp-Ratings\\data\\processed'
+data_path = '/home/tlappas/data_science/Yelp-Ratings/data/processed/processed_alice/'
 
 classifiers = [
-    RandomForestClassifier(max_depth=5), # Random Forest documentation recommends setting a default max_depth so trees don't become enormous.
-    AdaBoostClassifier(),
-    GaussianNB(),
-    MultinomialNB(),
-    BaggingClassifier(),
-    KNeighborsClassifier(n_neighbors=3),
-    SVC(kernel='linear')
+    RandomForestClassifier(max_depth=5, n_estimators=500), # Random Forest documentation recommends setting a default max_depth so trees don't become enormous.
+    LogisticRegression(),
+    SGDClassifier(),
+    SGDClassifier(loss='log'),
+    LinearSVC(),
+    KNeighborsClassifier(n_neighbors=3)
 ]
 
 #Different choices for remapping label data. Default is 'A', or [1,2,3,4,5]
 class_combos = {
 'A': [1,2,3,4,5],
-'B': [[1], [2,3,4], [5]], 
-'C': [[1,2], [4,5]], 
+'B': [[1], [2,3,4], [5]],
+'C': [[1,2], [4,5]],
 'D': [[1,2,3], [4,5]],
 'E': [[1,2,3,4], [5]],
 'F': [[1,2], [3,4], [5]],
@@ -93,31 +97,37 @@ print('Cross-validation: {} folds\n'.format(strat_kfold.get_n_splits()))
 
 for estimator in classifiers:
 
-    print('{} fitting - '.format(estimator.__class__.__name__), end='')
-    # Fit model
-    time_start = time.time()
-    estimator.fit(x_train, y_train)
-    time_stop = time.time()
-    elapsed = time_stop - time_start
-    print('{} minutes {} seconds'.format(elapsed // 60, elapsed % 60))
+    try:
+        print('{} fitting - '.format(estimator.__class__.__name__), end='')
+        # Fit model
+        time_start = time.time()
+        estimator.fit(x_train, y_train)
+        time_stop = time.time()
+        elapsed = time_stop - time_start
+        print('{} minutes {} seconds'.format(elapsed // 60, elapsed % 60))
 
-    # Predict on the training dataset
-    print('{} predict training - '.format(estimator.__class__.__name__), end='')
-    time_start = time.time()
-    train_predictions = estimator.predict(x_train)
-    time_stop = time.time()
-    elapsed = time_stop - time_start
-    print('{} minutes {} seconds'.format(elapsed // 60, elapsed % 60))
-    print('\tTraining Accuracy Score: {}'.format(accuracy_score(y_train, train_predictions)))
-    print('\tTraining F1 Score: {}\n'.format(f1_score(y_train, train_predictions, average='micro')))
+        # Predict on the training dataset
+        print('{} predict training - '.format(estimator.__class__.__name__), end='')
+        time_start = time.time()
+        train_predictions = estimator.predict(x_train)
+        time_stop = time.time()
+        elapsed = time_stop - time_start
+        print('{} minutes {} seconds'.format(elapsed // 60, elapsed % 60))
+        print('\tTraining Accuracy Score: {}'.format(accuracy_score(y_train, train_predictions)))
+        print('\tTraining F1 Score: {}\n'.format(f1_score(y_train, train_predictions, average='micro')))
+        print('\tTraining Confusion Matrix:\n {}'.format(confusion_matrix(y_train, train_predictions)))
 
-    # Predict on test dataset
-    print('{} predict testing - '.format(estimator.__class__.__name__), end='')
-    time_start = time.time()
-    test_predictions = estimator.predict(x_test)
-    time_stop = time.time()
-    elapsed = time_stop - time_start
-    print('{} minutes {} seconds'.format(elapsed // 60, elapsed % 60))
-    print('\tTesting Accuracy Score: {}'.format(accuracy_score(y_test, test_predictions)))
-    print('\tTesting F1 Score: {}'.format(f1_score(y_test, test_predictions, average='micro')))
-    print('\n')
+        # Predict on test dataset
+        print('{} predict testing - '.format(estimator.__class__.__name__), end='')
+        time_start = time.time()
+        test_predictions = estimator.predict(x_test)
+        time_stop = time.time()
+        elapsed = time_stop - time_start
+        print('{} minutes {} seconds'.format(elapsed // 60, elapsed % 60))
+        print('\tTesting Accuracy Score: {}'.format(accuracy_score(y_test, test_predictions)))
+        print('\tTesting F1 Score: {}'.format(f1_score(y_test, test_predictions, average='micro')))
+        print('\tTesting Confusion Matrix:\n {}'.format(confusion_matrix(y_test, test_predictions)))
+        print('\n')
+
+    except MemoryError:
+        continue
