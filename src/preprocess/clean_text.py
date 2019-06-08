@@ -18,7 +18,7 @@ parser.add_argument('-u', '--username', type=str, default='postgres', help='User
 parser.add_argument('-w', '--password', type=str, default='', help='Password to access database. Default is empty. Password is not needed if current user can access db.')
 parser.add_argument('-d', '--dbname', type=str, default='yelp', help='Name of the Postgres database. Default is \"yelp\"')
 parser.add_argument('-o', '--host', type=str, default="""/var/run/postgresql""", help="""Postgres host. Default is \"/var/run/postgresql/\"""")
-parser.add_argument('-p', '--path', type=str, default='/Users/alice.naghshineh/Desktop/pickled_data/threshold_analysis', help='Path to folder for saving pickled data. Default is \"/Users/alice.naghshineh/Desktop/pickled_data/threshold_analysis\"')
+parser.add_argument('-p', '--path', type=str, default='/Users/alice.naghshineh/Desktop/pickled_data/threshold_analysis/original_batches', help='Path to folder for saving pickled data. Default is \"/Users/alice.naghshineh/Desktop/pickled_data/threshold_analysis/original_batches\"')
 parser.add_argument('-pn', '--progress_number', type=int, default=10000, help='Set this number N for code to update you every time N number of reviews have been processed. Default is \"10000\"')
 
 args = parser.parse_args()
