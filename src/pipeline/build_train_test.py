@@ -14,7 +14,7 @@ class_combos = {
 'E': [[1,2,3,4], [5]],
 'F': [[1,2], [3,4], [5]],
 'G': [[1], [5]],
-'H': [[1,2], [4,5]]
+'H': [[1,2], [3], [4,5]]
 }
 
 def remap_labels(data, class_combo = 'A'): 
@@ -53,8 +53,8 @@ def remap_labels(data, class_combo = 'A'):
             return labels_dict.get(star, 0)
 
         if class_combo == 'H':
-            labels_dict = {1:1, 2:1, 4:2, 5:2}
-            return labels_dict.get(star, 0)
+            labels_dict = {1:1, 2:1, 3:2, 4:3, 5:3}
+            return labels_dict.get(star)
         
     data.loc[:,'stars'] = data.loc[:,'stars'].apply(lambda x: create_new_labels(x))
     df = data.loc[data['stars'] > 0]
