@@ -6,4 +6,4 @@ Folders Description:
 - Notebooks: Jupyter notebooks for text processing and exploratory data analysis. 
 - SRC: Source Code.  
 
-PLEASE GO TO Notebooks -> Final Presentation.ipynb to see our the team's live demo.
+PLEASE GO TO Notebooks -> Final Presentation.ipynb to see the live demo.
