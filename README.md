@@ -5,3 +5,5 @@ Folders Description:
 - Data: Samples data for testing and ingestion functions.  
 - Notebooks: Jupyter notebooks for text processing and exploratory data analysis. 
 - SRC: Source Code.  
+
+PLEASE GOT TO Notebooks -> Final Presentation.ipynb to see our the team's live demo.
