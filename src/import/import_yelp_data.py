@@ -7,6 +7,13 @@ import create_yelp_db
 import populate_yelp_db
 
 if __name__ == '__main__':
+    """Creates a Postgres database and populates it with information from the
+        Yelp json files.
+
+    Imports all available yelp data files into a database (created if necessary).
+        Allows users to log in with a username/password or by passing their
+        user credientials.
+    """
     # Argument parser
     parser = argparse.ArgumentParser()
     parser.add_argument('-u', '--username', type=str, default='postgres', help='User to access Postgres database. Default is \"postgres\"')

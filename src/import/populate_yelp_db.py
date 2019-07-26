@@ -4,14 +4,30 @@ import os
 import datetime
 
 class YelpDataImporter:
+    """Creates a database (if necessary) and fills table from json files.
+
+    Contains functions to create (if necessary) a database and tables to store
+    data from the Yelp JSON files. Provides on-screen feedback to the user.
+
+    Attributes:
+        conn: The database connection.
+        datafiles: A list of json data files.
+        dataset_path: The path where the data files live.
+        per_commit: The number of records to add to the db per commit.
+            Defaults to 1000.
+    """
 
     def __init__(self, conn, datafiles, dataset_path, per_commit=1000):
+        """Creates database connection and parameters for loading data.
+        """
         self.conn = conn
         self.datafiles = datafiles
         self.dataset_path = dataset_path
         self.per_commit = per_commit
 
     def populate(self):
+        """Imports data for available data files.
+        """
         if 'business.json' in self.datafiles:
             print('Importing data into business table...')
             self._populate_business_table()
@@ -30,6 +46,8 @@ class YelpDataImporter:
 
     # Not capturing attributes or hours. The JSON broke the query.
     def _populate_business_table(self):
+        """Imports data from the business.json file to the business table.
+        """
         cur = self.conn.cursor()
         n_processed = 0
         total_rows = 0
@@ -62,6 +80,8 @@ class YelpDataImporter:
         cur.close()
 
     def _populate_review_table(self):
+        """Imports data from the review.json file to the review table.
+        """
         cur = self.conn.cursor()
         with open(self.dataset_path + os.sep + 'review.json', 'r', encoding='utf8') as f:
             for line in f:
@@ -82,6 +102,8 @@ class YelpDataImporter:
         cur.close()
 
     def _populate_user_table(self):
+        """Imports data from the user.json file to the user_info table.
+        """
         cur = self.conn.cursor()
         with open(self.dataset_path + os.sep + 'user.json','r',encoding='utf8') as f:
             for line in f:
@@ -102,6 +124,8 @@ class YelpDataImporter:
         cur.close()
 
     def _populate_tip_table(self):
+        """Imports data from the tip.json file to the tip table.
+        """
         cur = self.conn.cursor()
         with open(self.dataset_path + os.sep + 'tip.json','r',encoding='utf8') as f:
             for line in f:
@@ -122,6 +146,8 @@ class YelpDataImporter:
         cur.close()
 
     def _populate_checkin_table(self):
+        """Imports data from the checkin.json file to the checkin table.
+        """
         cur = self.conn.cursor()
         with open(self.dataset_path + os.sep + 'tip.json','r',encoding='utf8') as f:
             for line in f:
@@ -141,8 +167,19 @@ class YelpDataImporter:
         self.conn.commit()
         cur.close()
 
-    #@classmethod
 def print_status_bar(prefix, current, total, symbol = '=', width = 80):
+    """Prints a status bar to the screen.
+
+    Args:
+        prefix: The text (string) that appears before the status-update section
+            of the bar.
+        current: The current progress represented as an int. Expected value is
+            in the less than total.
+        total: The completed task, represented as an integer.
+        symbol: The character to use as the progress bar. A single character is
+            expected. Expected to fail if len(symbol) > 1.
+        width: The width of the status bar.
+    """
     completed = symbol * int(current*width/total)
     remaining = ' ' * (width - int(current*width/total))
     percent = int(current*100/total)

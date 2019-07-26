@@ -14,6 +14,8 @@ class YelpDBMaker:
         self.datafiles = datafiles
 
     def create(self):
+        """Drops existing tables and re-creates them.
+        """
         print('Drop existing tables...')
         self._drop_existing_tables()
         if 'business.json' in self.datafiles:
@@ -28,6 +30,8 @@ class YelpDBMaker:
             self._create_user_table()
 
     def _drop_existing_tables(self):
+        """Drops any tables that correspond to existing Yelp json files.
+        """
         cur = self.conn.cursor()
         for datafile in self.datafiles:
             if datafile == 'user.json':
