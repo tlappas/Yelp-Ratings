@@ -13,8 +13,14 @@ There's a few things in the business table that need to be fixed:
         muliple categories.
     2. Attributes - same as above. This is going to be trickier though
         because there's a weird nested structure. Needs more investigation.
-    3. City, State, and Zip do not meet NF3. City and State can be derived
-        from the zip code.
+
+Remaining unnormalized:
+
+    1. City, State, and Zip do not meet NF3. City and State can be derived
+        from the zip code. ...but the caveat to this is that zip codes / areas
+        they reresent change and I'd have to use the year / find lists of
+        changes then wouldn't even be able to have a normalized zip, city, state
+        table anyway. Plus some zip codes contain multiple cities.
 
 """
 class YelpDBMaker:
