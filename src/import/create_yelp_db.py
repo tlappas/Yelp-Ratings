@@ -3,8 +3,18 @@ import psycopg2
 """
 TODO:
 
-1. Add error handling
-2. Add documentation
+Foriegn key constrains: user_id, business_id, and review_id should all be
+    foriegn keys.
+
+There's a few things in the business table that need to be fixed:
+
+    1. Categories should be stored in a seperate table with a mapping table
+        that connects them back to the business. Each business may have
+        muliple categories.
+    2. Attributes - same as above. This is going to be trickier though
+        because there's a weird nested structure. Needs more investigation.
+    3. City, State, and Zip do not meet NF3. City and State can be derived
+        from the zip code.
 
 """
 class YelpDBMaker:
