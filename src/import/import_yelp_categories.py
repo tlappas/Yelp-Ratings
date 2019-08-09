@@ -25,8 +25,8 @@ def create_bus_cat_mapping_table(conn):
     cur.execute("""
         CREATE TABLE bus_cat_map(
             business_id char(22),
-            cat_id int,
-            PRIMARY KEY(business_id, cat);
+            category_id int,
+            PRIMARY KEY(business_id, category_id);
         );
     """)
 
@@ -67,7 +67,7 @@ def populate_category_table(conn, cat_file):
     
         cur.commit()
 
-def map_bus_to_categories(conn):
+def map_business_to_categories(conn):
     """Fill 
     """
     current = 0
@@ -75,7 +75,7 @@ def map_bus_to_categories(conn):
     cat_cur = conn.get_cursor()
     map_cur = conn.get_cursor()
 
-    bus_cur.excute("""
+    bus_cur.execute("""
         SELECT business_id, categories
         FROM business;
         """)
@@ -86,18 +86,18 @@ def map_bus_to_categories(conn):
             for cat in categories:
                 # Find category in cat table
                 cat_cur.execute("""
-                    SELECT * 
+                    SELECT category_id 
                     FROM category 
                     WHERE name = %s;
                 """, cat)
 
                 # Add mapping
-                if cat_cur.fe
-                map_cur.execute("""
-                    INSERT INTO bus_cat_map (name, alias, parent)
-                    VALUES (%s, %s, %s);
-                """, ())
-
+                # This should only return one row. May need some error handling.
+                for match in cat_cur:
+                    map_cur.execute("""
+                        INSERT INTO bus_cat_map (business_id, category_id)
+                        VALUES (%s, %s);
+                    """, (row[0], match[0]))
 
 if __name__ == '__main__':
     # Connect to the database
@@ -109,7 +109,7 @@ if __name__ == '__main__':
     cat_file = open(cat_file_path, 'rb')
     populate_category_table(conn, cat_file)
     # Map businesses to categories
-    map_bus_to_categories(conn)
+    map_business_to_categories(conn)
     # Verify the table/column exist or add exception handling
     # Drop the cataegories column from the business table
     cur = conn.get_cursor()
