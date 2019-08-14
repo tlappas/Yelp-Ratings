@@ -28,6 +28,14 @@ class YelpDataImporter:
     def populate(self):
         """Imports data for available data files.
         """
+        column_names = {
+            'business':{'business_id':'business_id', 'name':'name', 'address':'address', 'city':'city', 'state':'state', 'postal_code':'postal_code', 'lat':'latitude', 'long':'longitude', 'stars':'stars', 'review_count':'review_count', 'is_open':'is_open', 'categories':'categories'},
+            'checkin':{'business_id':'business_id', 'dates':'date'},
+            'review':{'review_id':'review_id', 'user_id':'user_id', 'business_id':'business_id', 'stars':'stars', 'review_date':'date', 'review_text':'text', 'useful':'useful', 'funny':'funny', 'cool':'cool'},
+            'tip':{'tip_text':'text', 'tip_date':'date', 'compliment_count':'complement_count', 'business_id':'business_id', 'user_id':'user_id'},
+            'user':{'user_id':'user_id', 'name':'name', 'review_count':'review_count', 'yelping_since':'yelping_since', 'friends':'friends', 'useful':'useful', 'funny':'funny', 'cool':'cool', 'fans':'fans', 'elite':'elite', 'average_stars':'average_stars', 'compliment_hot':'compliment_hot', 'compliment_more':'compliment_more', 'compliment_profile':'compliment_profile', 'compliment_cute':'compliment_cute', 'compliment_list':'compliment_list', 'compliment_note':'compliment_note', 'compliment_plain':'compliment_plain', 'compliment_cool':'compliment_cool', 'compliment_funny':'compliment_funny', 'compliment_writer':'compliment_writer', 'compliment_photos':'compliment_photos'}
+        }
+
         if 'business.json' in self.datafiles:
             print('Importing data into business table...')
             self._populate_business_table()
