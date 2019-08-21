@@ -52,9 +52,24 @@ class YelpDataImporter:
             print('Importing data into user_info table...')
             self._populate_user_table()
 
-    # Not capturing attributes or hours. The JSON broke the query.
-    def _populate_business_table(self):
-        """Imports data from the business.json file to the business table.
+    # Not capturing business attributes or hours. The JSON broke the query.
+    def _populate_table(self, data_file):
+        """Populates a database table from a Yelp dataset json file.
+
+        Reads information in from any of the Yelp json files and inserts that
+        information into the corresponding database table.
+
+        This function builds the SQL query from the corresponding dictionary
+        inside the column_names dictionary. Using string functions to build 
+        the INSERT section of the query. This is only the column names, and
+        the values are hard-coded, not pulled dynamically from the json file.
+        All the values are safely added to the query through the cursor.execute
+        function.
+
+        This prevents SQL injection attacks and very ugly code duplication.
+
+        Args:
+            data_file: The name of the json file.
         """
         cur = self.conn.cursor()
         n_processed = 0
@@ -85,94 +100,6 @@ class YelpDataImporter:
                     #continue
         self.conn.commit()
         print_status_bar('business: ', n_processed, total_rows)
-        cur.close()
-
-    def _populate_review_table(self):
-        """Imports data from the review.json file to the review table.
-        """
-        cur = self.conn.cursor()
-        with open(self.dataset_path + os.sep + 'review.json', 'r', encoding='utf8') as f:
-            for line in f:
-                try:
-                    data = json.loads(line)
-                except json.JSONDecodeError as err:
-                    print('Encountered error decoding line in review.json')
-                    print('\n' + err)
-                    print('\n' + line[:60] + '\n')
-
-                try:
-                    cur.execute("""
-                        INSERT INTO review (review_id, user_id, business_id, stars, review_date, review_text, useful, funny, cool) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);
-                    """, (data['review_id'], data['user_id'], data['business_id'], data['stars'], data['date'], data['text'], data['useful'], data['funny'], data['cool']))
-                except psycopg2.Error as e:
-                    print(e.pgerror)
-        self.conn.commit()
-        cur.close()
-
-    def _populate_user_table(self):
-        """Imports data from the user.json file to the user_info table.
-        """
-        cur = self.conn.cursor()
-        with open(self.dataset_path + os.sep + 'user.json','r',encoding='utf8') as f:
-            for line in f:
-                try:
-                    data = json.loads(line)
-                except json.JSONDecodeError as err:
-                    print('Encountered error decoding line in user.json')
-                    print('\n' + err)
-                    print('\n' + line[:60] + '\n')
-
-                try:
-                    cur.execute("""
-                        INSERT INTO user_info (user_id, name, review_count, yelping_since, friends, useful, funny, cool, fans, elite, average_stars, compliment_hot, compliment_more, compliment_profile, compliment_cute, compliment_list, compliment_note, compliment_plain, compliment_cool, compliment_funny, compliment_writer, compliment_photos) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
-                    """, (data['user_id'], data['name'], data['review_count'], data['yelping_since'], data['friends'], data['useful'], data['funny'], data['cool'], data['fans'], data['elite'], data['average_stars'], data['compliment_hot'], data['compliment_more'], data['compliment_profile'], data['compliment_cute'], data['compliment_list'], data['compliment_note'], data['compliment_plain'], data['compliment_cool'], data['compliment_funny'], data['compliment_writer'], data['compliment_photos']))
-                except psycopg2.Error as e:
-                    print(e.pgerror)
-        self.conn.commit()
-        cur.close()
-
-    def _populate_tip_table(self):
-        """Imports data from the tip.json file to the tip table.
-        """
-        cur = self.conn.cursor()
-        with open(self.dataset_path + os.sep + 'tip.json','r',encoding='utf8') as f:
-            for line in f:
-                try:
-                    data = json.loads(line)
-                except json.JSONDecodeError as err:
-                    print('Encountered error decoding line in tip.json')
-                    print('\n' + err)
-                    print('\n' + line[:60] + '\n')
-
-                try:
-                    cur.execute("""
-                        INSERT INTO tip (tip_text, tip_date, compliment_count, business_id, user_id) VALUES (%s, %s, %s, %s, %s);
-                    """, (data['text'], data['date'], data['compliment_count'], data['business_id'], data['user_id']))
-                except psycopg2.Error as e:
-                    print(e.pgerror)
-        self.conn.commit()
-        cur.close()
-
-    def _populate_checkin_table(self):
-        """Imports data from the checkin.json file to the checkin table.
-        """
-        cur = self.conn.cursor()
-        with open(self.dataset_path + os.sep + 'tip.json','r',encoding='utf8') as f:
-            for line in f:
-                try:
-                    data = json.loads(line)
-                except json.JSONDecodeError as err:
-                    print('Encountered error decoding line in tip.json')
-                    print('\n' + err)
-                    print('\n' + line[:60] + '\n')
-
-                try:
-                    cur.execute("""
-                        INSERT INTO checkin (business_id, dates) VALUES (%s, %s);
-                    """, (data['business_id'], data['date']))
-                except psycopg2.Error as e:
-                    print(e.pgerror)
-        self.conn.commit()
         cur.close()
 
 def print_status_bar(prefix, current, total, symbol = '=', width = 80):
