@@ -1,4 +1,5 @@
 import psycopg2
+import psycopg2.sql
 import json
 import os
 import datetime
@@ -28,7 +29,7 @@ class YelpDataImporter:
     def populate(self):
         """Imports data for available data files.
         """
-        column_names = {
+        column_maps = {
             'business':{'business_id':'business_id', 'name':'name', 'address':'address', 'city':'city', 'state':'state', 'postal_code':'postal_code', 'lat':'latitude', 'long':'longitude', 'stars':'stars', 'review_count':'review_count', 'is_open':'is_open', 'categories':'categories'},
             'checkin':{'business_id':'business_id', 'dates':'date'},
             'review':{'review_id':'review_id', 'user_id':'user_id', 'business_id':'business_id', 'stars':'stars', 'review_date':'date', 'review_text':'text', 'useful':'useful', 'funny':'funny', 'cool':'cool'},
@@ -53,53 +54,69 @@ class YelpDataImporter:
             self._populate_user_table()
 
     # Not capturing business attributes or hours. The JSON broke the query.
-    def _populate_table(self, data_file):
+    def _populate_table(self, file_name, table_name):
         """Populates a database table from a Yelp dataset json file.
 
         Reads information in from any of the Yelp json files and inserts that
         information into the corresponding database table.
 
         This function builds the SQL query from the corresponding dictionary
-        inside the column_names dictionary. Using string functions to build 
-        the INSERT section of the query. This is only the column names, and
-        the values are hard-coded, not pulled dynamically from the json file.
-        All the values are safely added to the query through the cursor.execute
-        function.
-
-        This prevents SQL injection attacks and very ugly code duplication.
+        inside the column_names dictionary. It uses psycopg2.sql to safely build
+        the query string. This prevents SQL injection attacks and very ugly code
+        duplication.
 
         Args:
-            data_file: The name of the json file.
+            file_name: The name of the json file.
+            table_name: The name of the table. May differ from the file name
+                if the filename is a reserved word in Postgres.
         """
         cur = self.conn.cursor()
         n_processed = 0
         total_rows = 0
-        # replace with os.path.join
-        with open(self.dataset_path + os.sep + 'business.json','r',encoding='utf8') as f:
+
+        # Create list of keys.
+        # This is to preserve the order of the key/value pairs. Python guarentees
+        #   that keys retrieved from a dictionary multiple times will be in the 
+        #   same order, provided the dict hasn't been altered. But this for loop
+        #   creates many dicts that all have the same keys and it's unclear if
+        #   the key order property can be guarenteed.
+        column_map = column_maps[file_name.split('.json')[0]]
+        columns = [*column_map]
+
+        # Generate SQL statement
+        query = psycopg2.sql.SQL('INSERT INTO {} ({}) VALUES ({});').format(
+            psycopg2.sql.Identifier(table_name),
+            psycopg2.sql.SQL(', ').join([psycopg2.sql.Identifier(col_name) for col_name in columns]),
+            psycopg2.sql.SQL(', ').join(['%s'] * len(columns))
+        )
+
+        with open(os.path.join(self.dataset_path, file_name),'r',encoding='utf8') as f:
             for line in f:
                 total_rows += 1
             f.seek(0)
             for line in f:
+                # Load json object into dictionary
                 try:
                     data = json.loads(line)
                 except json.JSONDecodeError as err:
-                    print('Encountered error decoding line in business.json')
+                    print('Encountered error decoding line in json file.')
                     print('\n' + err)
                     print('\n' + line[:60] + '\n')
+                    continue
 
+                # Insert dict values into database table
                 try:
-                    cur.execute("""
-                        INSERT INTO business (business_id, name, address, city, state, postal_code, lat, long, stars, review_count, is_open, categories) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);""", (data['business_id'], data['name'], data['address'], data['city'], data['state'], data['postal_code'], data['latitude'], data['longitude'], str(data['stars']), data['review_count'], str(data['is_open']), data['categories']))
+                    cur.execute(query, tuple([data[column_map[col_name]] for col_name in columns]))
                     n_processed += 1
                     if n_processed % self.per_commit == 0:
                         self.conn.commit()
-                        print_status_bar('business: ', n_processed, total_rows)
+                        print_status_bar('{}: '.format(table_name), n_processed, total_rows)
                 except psycopg2.Error as e:
                     print(e.pgerror)
                     # Add logging and error handling
-                    #continue
+                    continue
         self.conn.commit()
-        print_status_bar('business: ', n_processed, total_rows)
+        print_status_bar('{}: '.format(table_name), n_processed, total_rows)
         cur.close()
 
 def print_status_bar(prefix, current, total, symbol = '=', width = 80):
@@ -109,7 +126,7 @@ def print_status_bar(prefix, current, total, symbol = '=', width = 80):
         prefix: The text (string) that appears before the status-update section
             of the bar.
         current: The current progress represented as an int. Expected value is
-            in the less than total.
+            less than total.
         total: The completed task, represented as an integer.
         symbol: The character to use as the progress bar. A single character is
             expected. Expected to fail if len(symbol) > 1.
