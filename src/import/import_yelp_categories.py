@@ -110,6 +110,23 @@ if __name__ == '__main__':
     cat_file_path = '/home/tlappas/data_science/Yelp-Ratings/data/raw/categories.json'
     # Connect to the database
     conn = psycopg2.connect('dbname={} user={} host={}'.format('yelp', 'tlappas', '/var/run/postgresql/'))
+    # Drop existing DB tables (for testing)
+    try:
+        conn.set_session(autocommit=True)
+        cur = conn.cursor()
+
+        cur.execute("""
+            DROP TABLE category;
+        """)
+        cur.execute("""
+            DROP TABLE bus_cat_map;
+        """)
+
+        conn.set_session(autocommit=False)
+        cursor.close()
+    except:
+        pass
+
     # Create DB tables
     create_category_table(conn)
     create_bus_cat_mapping_table(conn)
