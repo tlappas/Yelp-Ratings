@@ -141,10 +141,10 @@ if __name__ == '__main__':
         conn.set_session(autocommit=True)
 
         cur.execute("""
-            DROP TABLE category;
+            DROP TABLE bus_cat_map;
         """)
         cur.execute("""
-            DROP TABLE bus_cat_map;
+            DROP TABLE category;
         """)
 
         conn.set_session(autocommit=False)
