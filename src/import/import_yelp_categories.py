@@ -2,6 +2,8 @@ import psycopg2
 import json
 import sys
 
+import populate_yelp_db
+
 def create_category_table(conn):
     """Create a table to store all Yelp (primary) categories.
     """
@@ -69,7 +71,7 @@ def populate_category_table(conn, cat_file):
     conn.commit()
     cur.close()
 
-def map_business_to_categories(conn):
+def map_business_to_categories(conn, per_commit=1000):
     """Fill 
     """
     current = 0
@@ -78,13 +80,19 @@ def map_business_to_categories(conn):
     map_cur = conn.cursor()
 
     bus_cur.execute("""
+        SELECT COUNT(*) FROM business
+        LIMIT 50000;
+    """)
+    bus_count = bus_cur.fetchone()[0]
+
+    bus_cur.execute("""
         SELECT business_id, categories
         FROM business
         WHERE categories IS NOT NULL
-        LIMIT 10;
-        """)
+        LIMIT 50000;
+    """)
 
-    for row in bus_cur:
+    for index, row in enumerate(bus_cur):
         categories = row[1].split(', ')
         for cat in categories:
             cat_cur.execute("""
@@ -100,7 +108,10 @@ def map_business_to_categories(conn):
                     VALUES (%s, %s);
                 """, (row[0], match[0]))
 
-        conn.commit()
+        if index % per_commit == 0:
+            populate_yelp_db.print_status_bar('Map Businesses to Categories: ', index, bus_count)
+            conn.commit()
+    populate_yelp_db.print_status_bar('Map Businesses to Categories: ', bus_count, bus_count)
 
     bus_cur.close()
     cat_cur.close()
