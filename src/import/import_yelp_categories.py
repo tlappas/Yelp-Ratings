@@ -80,16 +80,14 @@ def map_business_to_categories(conn, per_commit=1000):
     map_cur = conn.cursor()
 
     bus_cur.execute("""
-        SELECT COUNT(*) FROM business
-        LIMIT 50000;
+        SELECT COUNT(*) FROM business;
     """)
     bus_count = bus_cur.fetchone()[0]
 
     bus_cur.execute("""
         SELECT business_id, categories
         FROM business
-        WHERE categories IS NOT NULL
-        LIMIT 50000;
+        WHERE categories IS NOT NULL;
     """)
 
     for index, row in enumerate(bus_cur):
@@ -105,7 +103,7 @@ def map_business_to_categories(conn, per_commit=1000):
             for match in cat_cur:
                 map_cur.execute("""
                     INSERT INTO bus_cat_map (business_id, category_id)
-                    VALUES (%s, %s);
+                    VALUES (%s, %s) ON CONFLICT ON CONSTRAINT bus_cat_map_pkey DO NOTHING;
                 """, (row[0], match[0]))
 
         if index % per_commit == 0:
