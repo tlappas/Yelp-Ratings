@@ -1,4 +1,4 @@
-import psychpg2
+import psycopg2
 import json
 
 def create_category_table(conn):
@@ -10,7 +10,7 @@ def create_category_table(conn):
             id serial PRIMARY KEY,
             name text NOT NULL,
             alias text NOT NULL,
-            parent text;
+            parent text
         );
     """)
 
@@ -26,15 +26,15 @@ def create_bus_cat_mapping_table(conn):
         CREATE TABLE bus_cat_map(
             business_id char(22),
             category_id int,
-            PRIMARY KEY(business_id, category_id);
+            PRIMARY KEY(business_id, category_id)
         );
     """)
 
     conn.commit()
-    cursor.close()
+    cur.close()
 
 def populate_category_table(conn, cat_file):
-    """Fills category table with each primary category.
+    """Fills category table with each primary and secondary categories.
 
         Yelp provides a json file (categories.json) for developers that lists
         hirarchical categories as an adjacency list
@@ -45,7 +45,7 @@ def populate_category_table(conn, cat_file):
 
         Yelp API(v3) list: https://www.yelp.com/developers/documentation/v3/category_list
     """
-    cur = conn.get_cursor()
+    cur = conn.cursor()
 
     all_cats = json.load(cat_file)
 
@@ -64,16 +64,17 @@ def populate_category_table(conn, cat_file):
                 VALUES (%s, %s, %s);
             """,
             (s['title'], s['alias'], p['alias']))
-    
-        cur.commit()
+
+    conn.commit()
+    cur.close()
 
 def map_business_to_categories(conn):
     """Fill 
     """
     current = 0
-    bus_cur = conn.get_cursor()
-    cat_cur = conn.get_cursor()
-    map_cur = conn.get_cursor()
+    bus_cur = conn.cursor()
+    cat_cur = conn.cursor()
+    map_cur = conn.cursor()
 
     bus_cur.execute("""
         SELECT business_id, categories
@@ -86,7 +87,7 @@ def map_business_to_categories(conn):
             for cat in categories:
                 # Find category in cat table
                 cat_cur.execute("""
-                    SELECT category_id 
+                    SELECT category.id 
                     FROM category 
                     WHERE name = %s;
                 """, cat)
@@ -98,10 +99,17 @@ def map_business_to_categories(conn):
                         INSERT INTO bus_cat_map (business_id, category_id)
                         VALUES (%s, %s);
                     """, (row[0], match[0]))
+    
+    conn.commit()
+
+    bus_cur.close()
+    cat_cur.close()
+    map_cur.close()
 
 if __name__ == '__main__':
+    cat_file_path = '/home/tlappas/data_science/Yelp-Ratings/data/raw/categories.json'
     # Connect to the database
-    conn = psycopg2.connect('')
+    conn = psycopg2.connect('dbname={} user={} host={}'.format('yelp', 'tlappas', '/var/run/postgresql/'))
     # Create DB tables
     create_category_table(conn)
     create_bus_cat_mapping_table(conn)
@@ -112,10 +120,10 @@ if __name__ == '__main__':
     map_business_to_categories(conn)
     # Verify the table/column exist or add exception handling
     # Drop the cataegories column from the business table
-    cur = conn.get_cursor()
+    #cur = conn.get_cursor()
     # I think this is wrong. At least for create table you need to use an autocommiting cursor
-    cur.execute("""
-        ALTER TABLE %s 
-        DROP COLUMN %s;
-    """, ('business', 'categories'))
-    cur.close()
+    #cur.execute("""
+    #    ALTER TABLE %s 
+    #    DROP COLUMN %s;
+    #""", ('business', 'categories'))
+    #cur.close()
