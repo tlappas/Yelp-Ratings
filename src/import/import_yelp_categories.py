@@ -1,5 +1,6 @@
 import psycopg2
 import json
+import sys
 
 def create_category_table(conn):
     """Create a table to store all Yelp (primary) categories.
@@ -110,10 +111,10 @@ if __name__ == '__main__':
     cat_file_path = '/home/tlappas/data_science/Yelp-Ratings/data/raw/categories.json'
     # Connect to the database
     conn = psycopg2.connect('dbname={} user={} host={}'.format('yelp', 'tlappas', '/var/run/postgresql/'))
+    cur = conn.cursor()
     # Drop existing DB tables (for testing)
     try:
         conn.set_session(autocommit=True)
-        cur = conn.cursor()
 
         cur.execute("""
             DROP TABLE category;
@@ -123,9 +124,9 @@ if __name__ == '__main__':
         """)
 
         conn.set_session(autocommit=False)
-        cursor.close()
     except:
-        pass
+        cursor.close()
+        sys.exit('Unable to drop the existing category and/or bus_cat_map tables!\n')
 
     # Create DB tables
     create_category_table(conn)
