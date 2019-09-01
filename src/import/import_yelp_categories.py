@@ -79,39 +79,41 @@ def map_business_to_categories(conn):
 
     bus_cur.execute("""
         SELECT business_id, categories
-        FROM business;
+        FROM business
+        WHERE categories IS NOT NULL
+        LIMIT 10;
         """)
 
-    for rows in bus_cur:
-        for row in rows:
-            categories = row[1].split(',')
-            for cat in categories:
-                # Find category in cat table
-                cat_cur.execute("""
-                    SELECT category.id 
-                    FROM category 
-                    WHERE name = %s;
-                """, cat)
+    for row in bus_cur:
+        categories = row[1].split(', ')
+        for cat in categories:
+            cat_cur.execute("""
+                SELECT category.id 
+                FROM category 
+                WHERE name = %s;
+            """, (cat,))
 
-                # Add mapping
-                # This should only return one row. May need some error handling.
-                for match in cat_cur:
-                    map_cur.execute("""
-                        INSERT INTO bus_cat_map (business_id, category_id)
-                        VALUES (%s, %s);
-                    """, (row[0], match[0]))
-    
-    conn.commit()
+            # This should only return one row. May need some error handling.
+            for match in cat_cur:
+                map_cur.execute("""
+                    INSERT INTO bus_cat_map (business_id, category_id)
+                    VALUES (%s, %s);
+                """, (row[0], match[0]))
+
+        conn.commit()
 
     bus_cur.close()
     cat_cur.close()
     map_cur.close()
 
 if __name__ == '__main__':
+    
     cat_file_path = '/home/tlappas/data_science/Yelp-Ratings/data/raw/categories.json'
+    
     # Connect to the database
     conn = psycopg2.connect('dbname={} user={} host={}'.format('yelp', 'tlappas', '/var/run/postgresql/'))
     cur = conn.cursor()
+    
     # Drop existing DB tables (for testing)
     try:
         conn.set_session(autocommit=True)
@@ -131,17 +133,12 @@ if __name__ == '__main__':
     # Create DB tables
     create_category_table(conn)
     create_bus_cat_mapping_table(conn)
+    
     # Fill category table from json file
     cat_file = open(cat_file_path, 'rb')
     populate_category_table(conn, cat_file)
+    
     # Map businesses to categories
     map_business_to_categories(conn)
-    # Verify the table/column exist or add exception handling
-    # Drop the cataegories column from the business table
-    #cur = conn.get_cursor()
-    # I think this is wrong. At least for create table you need to use an autocommiting cursor
-    #cur.execute("""
-    #    ALTER TABLE %s 
-    #    DROP COLUMN %s;
-    #""", ('business', 'categories'))
-    #cur.close()
+    
+    cur.close()
