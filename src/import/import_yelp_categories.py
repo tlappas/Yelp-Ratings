@@ -5,7 +5,13 @@ import sys
 import populate_yelp_db
 
 def create_category_table(conn):
-    """Create a table to store all Yelp (primary) categories.
+    """Create a table to store Yelp categories.
+
+    Stores primary and secondary categories along with their parent category.
+    Primary categories have a null parent.
+
+    Args:
+        conn: The database connection.
     """
     cur = conn.cursor()
     cur.execute("""
@@ -22,7 +28,10 @@ def create_category_table(conn):
 
 
 def create_bus_cat_mapping_table(conn):
-    """Creates table that maps between business_id and categories.
+    """Creates mapping table for businesses and categories.
+
+    Args:
+        conn: The database connection.
     """
     cur = conn.cursor()
     cur.execute("""
@@ -37,16 +46,20 @@ def create_bus_cat_mapping_table(conn):
     cur.close()
 
 def populate_category_table(conn, cat_file):
-    """Fills category table with each primary and secondary categories.
+    """Fills category table with primary and secondary categories.
 
-        Yelp provides a json file (categories.json) for developers that lists
-        hirarchical categories as an adjacency list
-        ("category: Italian, parent: Restaurant"). They also provide the full
-        category structure (i.e. Resturants > Italian > Sicilian). Within the
-        Yelp business.json file, businesses are described with secondary and
-        tertiary categories.
+    Yelp provides a json file (categories.json) for developers that lists
+    hirarchical categories as an adjacency list
+    ("category: Italian, parent: Restaurant"). They also provide the full
+    category structure (i.e. Resturants > Italian > Sicilian). Within the
+    Yelp business.json file, businesses are described with secondary and
+    tertiary categories.
 
-        Yelp API(v3) list: https://www.yelp.com/developers/documentation/v3/category_list
+    Yelp API(v3) list: https://www.yelp.com/developers/documentation/v3/category_list
+
+    Args:
+        conn: The database connection.
+        cat_file: A file handle to the categories.json file.
     """
     cur = conn.cursor()
 
@@ -72,7 +85,7 @@ def populate_category_table(conn, cat_file):
     cur.close()
 
 def map_business_to_categories(conn, per_commit=1000):
-    """Fill 
+    """Populate mapping table.
     """
     current = 0
     bus_cur = conn.cursor()
@@ -99,7 +112,6 @@ def map_business_to_categories(conn, per_commit=1000):
                 WHERE name = %s;
             """, (cat,))
 
-            # This should only return one row. May need some error handling.
             for match in cat_cur:
                 map_cur.execute("""
                     INSERT INTO bus_cat_map (business_id, category_id)
@@ -109,6 +121,7 @@ def map_business_to_categories(conn, per_commit=1000):
         if index % per_commit == 0:
             populate_yelp_db.print_status_bar('Map Businesses to Categories: ', index, bus_count)
             conn.commit()
+
     populate_yelp_db.print_status_bar('Map Businesses to Categories: ', bus_count, bus_count)
 
     bus_cur.close()
