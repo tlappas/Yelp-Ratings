@@ -36,8 +36,8 @@ def create_bus_cat_mapping_table(conn):
     cur = conn.cursor()
     cur.execute("""
         CREATE TABLE bus_cat_map(
-            business_id char(22),
-            category_id int,
+            business_id char(22) REFERENCES business(business_id),
+            category_id int REFERENCES category(id),
             PRIMARY KEY(business_id, category_id)
         );
     """)
