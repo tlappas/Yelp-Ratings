@@ -1,3 +1,4 @@
+**Import Code**
 - [ ] Pass user params in through a config file.
 - [ ] Incorporate category code into db setup code
 - [ ] Generic populate function
@@ -6,3 +7,4 @@
 - [ ] Create logic for multiple connection strings based on which params have values
 - [ ] Do I need to make the connection string safe (no string format replacement)
 - [ ] All CREATE and DROP functions should use the psycopg2.SQL substitution functions.
+- [ ] Set up foreign keys
