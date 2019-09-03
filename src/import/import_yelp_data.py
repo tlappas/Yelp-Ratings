@@ -2,6 +2,8 @@ import psycopg2
 import os
 import argparse
 import sys
+import configparser
+import path
 import pdb
 import create_yelp_db
 import populate_yelp_db
@@ -10,33 +12,54 @@ if __name__ == '__main__':
     """Creates a Postgres database and populates it with information from the
         Yelp json files.
 
-    Imports all available yelp data files into a database (created if necessary).
+        Imports all available yelp data files into a database (created if necessary).
         Allows users to log in with a username/password or by passing their
         user credientials.
     """
     # Argument parser
     parser = argparse.ArgumentParser()
-    parser.add_argument('-u', '--username', type=str, default='postgres', help='User to access Postgres database. Default is \"postgres\"')
-    parser.add_argument('-w', '--password', type=str, default='', help='Password to access database. Default is empty. Password is not needed if current user can access db.')
-    parser.add_argument('-d', '--dbname', type=str, default='yelp', help='Name of the Postgres database. Default is \"yelp\"')
-    parser.add_argument('-p', '--path', type=str, help="""Location of the yelp json files. Default is the yelp test data.""")
-    parser.add_argument('-o', '--host', type=str, default="""/var/run/postgresql""", help="""Postgres host. Default is \"/var/run/postgresql/\"""")
+
+    parser.add_argument('-c', '--config', type=str, help='Config file name. Assumed to be in the project\'s config folder.')
     parser.add_argument('-f', '--force', action='store_true', help='Drop an existing database with the same name. Default is \"False\".')
     parser.add_argument('-q', '--quiet', action='store_true', help='Suppress status updates in terminal. Default is \"False\".')
 
     args = parser.parse_args()
-    dbname = args.dbname
-    username = args.username
-    password = args.password
-    host = args.host.lower()
-    dataset_path = args.path
+    conf_file = args.config
     force = args.force
     quiet = args.quiet
+
+    # Locate/open the config file. Unrecoverable if not found.
+    # Assuming a standard project folder structure with
+    #   top level src and config folders.
+
+    config = configparser.ConfigParser()
+
+    proj_path = os.path.normpath(os.path.normcase(os.path.dirname(os.path.abspath(__file__))))
+    try:
+        proj_path = os.path.join(proj_path[:proj_path.index('src')-1])
+    except:
+        stderr('Cannot locate project\'s src folder.')
+    try:
+        config.read(os.path.join(proj_path, 'config', conf_file))
+    except:
+        stderr('Cannot read config file - {}.'.format(conf_file))
+
+    # Load config params
+    # If any of the first three params are blank it should kill the program
+    dbname = config['db-conn']['dbname']
+    host = config['db-conn']['host']
+    username = config['db-conn']['username']
+    password = config['db-conn']['password']
+    dataset_path = config['project-info']['dataset_path']
+
+    conn_str = 'dbname={} host={} user={}'.format(dbname, host, username)
+    if password:
+        conn_str += ' password={}'.format(password)
 
     conn = None
     try:
         # There's a bug here with a poor workaround. If one of the variables is blank, it kills the rest of the format substitution.
-        conn = psycopg2.connect('dbname={} user={} host={} password={}'.format(dbname, username, host, password))
+        conn = psycopg2.connect(conn_str)
         if force == False:
             print('Database {} already exists. If you\'d like to drop and recreate existing tables use --force.'.format(dbname))
             sys.exit()
