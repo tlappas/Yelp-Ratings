@@ -3,10 +3,13 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import pprint
 import pickle
+import os.path
 
 if __name__ == '__main__':
 	conn = psycopg2.connect('dbname={} user={} host={}'.format('yelp', 'tlappas', '/var/run/postgresql'))
 	cur = conn.cursor()
+
+	proj_dir = os.path.normpath('/home/tlappas/data_science/Yelp-Ratings/')
 
 	pp = pprint.PrettyPrinter(indent=4).pprint
 
@@ -31,8 +34,11 @@ if __name__ == '__main__':
 		ORDER BY category.name, review.stars ASC;
 	""")
 
-	#star_counts.append([*cur.fetchall()])
-	star_counts = [*cur.fetchall()]
+	rows = [*cur.fetchall()]
+	star_counts = {}
+	for i in range(0, len(rows), 5):
+		star_counts[rows[i][0]] = [rows[j][2] for j in range(i, i+5)]
+
 	pp(star_counts)
 	print('')
 
@@ -45,5 +51,5 @@ if __name__ == '__main__':
 	all_stars = [*cur.fetchall()]
 	pp(all_stars)
 
-	with open('star_counts.pkl', 'wb') as pkl_file:
+	with open(os.path.join(proj_dir, 'data', 'eda', 'star_counts.pkl'), 'wb') as pkl_file:
 		pickle.dump([primary, star_counts, all_stars], pkl_file)
